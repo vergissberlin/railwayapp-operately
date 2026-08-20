@@ -1,0 +1,22 @@
+<svg width="1280" height="270" viewBox="0 0 1280 270" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Operately header banner</title>
+  <desc id="desc">Flat gradient banner for Operately template with software logo.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1280" y2="270" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0B1021"/>
+      <stop offset="0.55" stop-color="#131B3F"/>
+      <stop offset="1" stop-color="#1F174A"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="270" rx="26" fill="url(#bg)"/>
+  <circle cx="1120" cy="68" r="34" fill="#4F46E5" opacity="0.33"/>
+  <circle cx="1185" cy="205" r="56" fill="#06B6D4" opacity="0.15"/>
+  
+      <rect x="64" y="60" width="152" height="152" rx="24" fill="#0B1228" opacity="0.92"/>
+      <image href="data:image/png;base64,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" x="84" y="80" width="112" height="112" preserveAspectRatio="xMidYMid meet"/>
+    
+  <text x="258" y="122" fill="#FFFFFF" font-family="Inter,Segoe UI,Roboto,Helvetica,Arial,sans-serif" font-size="52" font-weight="800">Operately</text>
+  <text x="258" y="168" fill="#B6C2FF" font-family="Inter,Segoe UI,Roboto,Helvetica,Arial,sans-serif" font-size="28" font-weight="500">Railway Template</text>
+  <rect x="258" y="188" width="286" height="44" rx="22" fill="#1C285D" stroke="#67E8F9" stroke-opacity="0.6"/>
+  <text x="284" y="216" fill="#CFFAFE" font-family="Inter,Segoe UI,Roboto,Helvetica,Arial,sans-serif" font-size="19" font-weight="700">Deploy on Railway</text>
+</svg>

@@ -1,0 +1,10 @@
+.env
+.env.*
+!.env.example
+
+# Local container data
+data/
+
+# OS files
+.DS_Store
+Thumbs.db

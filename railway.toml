@@ -1,0 +1,10 @@
+[build]
+builder = "DOCKERFILE"
+
+[deploy]
+preDeployCommand = ["/opt/operately/bin/create_db", "/opt/operately/bin/migrate"]
+healthcheckPath = "/health"
+healthcheckTimeout = 300
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
+requiredMountPath = "/media"
