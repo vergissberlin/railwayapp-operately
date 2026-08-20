@@ -15,17 +15,16 @@ Docker image on Railway, backed by a separate Postgres service for data storage.
 ## About Hosting Operately
 
 Hosting Operately on Railway means running its Elixir/Phoenix release container next to a
-managed Postgres instance, with Railway generating the public domain, terminating TLS, and
-running the database migration automatically via `preDeployCommand` before every deploy. There
-is no server to patch and no reverse proxy to configure by hand.
+managed Postgres instance, with Railway generating the domain, terminating TLS, and running
+the database migration automatically before every deploy — no server to patch, no reverse
+proxy to configure by hand.
 
 ## Why Deploy Operately on Railway
 
 * No server provisioning — Railway builds and runs the container from the pinned upstream image
-* Postgres attaches as a managed Railway service instead of a self-hosted database to babysit
-* TLS and the public domain are handled at Railway's edge, so `OPERATELY_HOST` only ever needs
-  the bare hostname
-* Database migrations run automatically on every deploy via `preDeployCommand`, no manual SSH step
+* Postgres attaches as a managed service instead of a self-hosted database to babysit
+* TLS and the domain are handled at Railway's edge, so `OPERATELY_HOST` only needs a hostname
+* Migrations run automatically on every deploy via `preDeployCommand`, no manual SSH step
 * Renovate keeps the pinned image tag current without floating on `latest`
 
 ## Common Use Cases
@@ -44,12 +43,6 @@ is no server to patch and no reverse proxy to configure by hand.
   `ee/` (Enterprise Edition) subtree. This template only references the published Docker image,
   it does not build or redistribute the source.
 
-## ✨ Features
-
-* Goals, projects, and check-ins for teams, replacing status-update meetings
-* OKR-style progress tracking with automatic roll-ups across projects
-* Company-wide visibility into who owns what and how it is progressing
-
 ## 🚀 Quick Start
 
 1. Click "Deploy on Railway"
@@ -64,30 +57,22 @@ is no server to patch and no reverse proxy to configure by hand.
 ### Environment variables
 
 ```bash
-DATABASE_URL=${{Postgres.DATABASE_URL}}   # Reference variable to a separate Railway Postgres service (Ecto connection string)
-SECRET_KEY_BASE=replace-with-strong-random-value   # Set as a generated secret in the Railway dashboard; signs/encrypts cookies
-OPERATELY_BLOB_TOKEN_SECRET_KEY=replace-with-strong-random-value   # Set as a generated secret; signs file/blob URLs, required for uploads to work
-SYSTEM_SETTINGS_ENCRYPTION_KEYS=replace-with-strong-random-value   # Set as a generated secret; encrypts stored system settings
-OPERATELY_HOST=${{RAILWAY_PUBLIC_DOMAIN}}   # Bare hostname only, no scheme or port
-OPERATELY_URL_SCHEME=https   # Railway always terminates TLS at the edge
-ALLOW_LOGIN_WITH_EMAIL=yes   # Without this and without Google OAuth configured, nobody can log in
-ALLOW_SIGNUP_WITH_EMAIL=yes   # Allows the first account to be created without SMTP/Google OAuth
-CERT_DOMAIN=""   # Must be set (empty string, not unset) or Operately crashes at boot — see below
-CERT_EMAILS=""   # Same requirement as CERT_DOMAIN
-CERT_DB_DIR=/opt/operately/certs   # Baked into the image; only backs an unused internal listener
+DATABASE_URL=${{Postgres.DATABASE_URL}}     # reference to a separate Postgres service
+SECRET_KEY_BASE=generate-a-secret           # Railway "generate" button; signs/encrypts cookies
+OPERATELY_BLOB_TOKEN_SECRET_KEY=generate-a-secret   # signs file/blob URLs
+SYSTEM_SETTINGS_ENCRYPTION_KEYS=generate-a-secret   # encrypts stored settings
+OPERATELY_HOST=${{RAILWAY_PUBLIC_DOMAIN}}   # bare hostname, no scheme or port
+OPERATELY_URL_SCHEME=https
+ALLOW_LOGIN_WITH_EMAIL=yes    # without this + no Google OAuth, nobody can log in
+ALLOW_SIGNUP_WITH_EMAIL=yes
+CERT_DOMAIN=""                # must be set (empty string, not unset) — see below
+CERT_EMAILS=""
+CERT_DB_DIR=/opt/operately/certs
 ```
 
-Set real credentials as Railway variables, never in a file inside this repository.
-
-### Optional
-
-* `PORT`: HTTP port Operately binds to (default: `4000`). Railway sets this for you;
-  leave it alone unless you also change the domain's target port.
-
-## 💾 Persistence
-
-`railway.toml` declares `requiredMountPath = "/media"`. Attach a Railway volume to that
-path before production traffic, otherwise all data is lost on every redeploy.
+Set real values as Railway variables, never in a file in this repo. `PORT` defaults to `4000`
+and Railway sets it for you. `requiredMountPath = "/media"` in `railway.toml` — attach a volume
+there before production traffic, or uploads are lost on every redeploy.
 
 ## 🐳 Local Development
 
@@ -100,58 +85,36 @@ docker compose exec operately /opt/operately/bin/create_db
 docker compose exec operately /opt/operately/bin/migrate
 ```
 
-`preDeployCommand` in `railway.toml` only runs on Railway, so the two release commands above
-have to be run by hand for local Docker Compose. Then open http://localhost:4000.
-
-## 🪲 Bug Reporting
-
-Found a bug? [Create an issue](https://github.com/vergissberlin/railwayapp-operately/issues/new) or open a pull request with a fix.
+`preDeployCommand` only runs on Railway, so run the two commands above by hand locally. Then
+open http://localhost:4000.
 
 ## 🤝 Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md).
+Found a bug? [Open an issue](https://github.com/vergissberlin/railwayapp-operately/issues/new)
+or a pull request. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## 📝 License
 
 MIT — see [LICENSE](LICENSE).
 
-## 🔒 Security
-
-* All credentials are supplied as environment variables, never committed
-* Railway terminates TLS for the generated domain
-* Renovate keeps the pinned upstream image up to date
-
 ## Railway runtime defaults
 
-`railway.toml` ships these defaults:
-
-* Healthcheck path: `/health`
-* Restart policy: `ON_FAILURE` with up to 10 retries
-* Dockerfile-based build
-* `preDeployCommand`: runs `predeploy.sh`, which calls `/opt/operately/bin/create_db` then
-  `/opt/operately/bin/migrate` — the same two release commands the official single-host
-  installer runs. Railway's `preDeployCommand` only accepts a single command, so chaining
-  them needed a real script rather than a `&&`-joined string.
-
-Operately listens on `$PORT` directly, so no start command or entrypoint wrapper is configured.
-
-**`CERT_DOMAIN`/`CERT_EMAILS`/`CERT_DB_DIR` must be set, even though this template never uses
-real TLS certificates.** Operately's `SiteEncrypt.Phoenix.Endpoint` child validates and chmods
-these at every boot regardless of `CERT_AUTO_RENEW` — leaving them unset crashes the app with a
-`FunctionClauseError` (nil domain) or a `File.Error` (nil/unwritable cert folder), not a graceful
-skip. This template sets `CERT_DOMAIN=""` and `CERT_EMAILS=""` (matching the official installer's
-own "skip TLS management" path) and points `CERT_DB_DIR` at `/opt/operately/certs` — a folder
-baked into the image and owned by `nobody`, deliberately outside the `/media` volume mount (a
-volume's contents replace whatever was baked into its mount path at build time, so a directory
-created under `/media` in the Dockerfile does not exist yet when the container actually boots).
-The resulting self-signed certificate and the internal `:4001` HTTPS listener are both unused —
-Railway terminates real TLS at its edge and only ever talks to the app over plain HTTP on `$PORT`.
+* Healthcheck `/health` · Restart `ON_FAILURE` (10 retries) · Dockerfile build · TLS at Railway's
+  edge, credentials only ever set as variables, never committed
+* `preDeployCommand` runs `predeploy.sh` (`create_db` then `migrate`) — Railway only accepts one
+  command, so chaining needed a real script, not a `&&`-joined string
+* Operately reads `$PORT` directly, no start command or entrypoint wrapper needed
+* `CERT_DOMAIN`/`CERT_EMAILS`/`CERT_DB_DIR` are set even though no real TLS cert is used here:
+  Operately's cert-management child validates and chmods these at every boot regardless of
+  `CERT_AUTO_RENEW`, and unset values crash the app. Empty strings for the first two match the
+  official installer's own "skip TLS" path; `CERT_DB_DIR=/opt/operately/certs` is a
+  `nobody`-owned folder baked into the image, kept outside `/media` (a volume's contents replace
+  whatever the Dockerfile put at its mount path, so it isn't there by boot time).
 
 ## 📚 Resources
 
-* [Operately documentation](https://github.com/operately/operately/blob/main/docs/installation/single-host.md)
-* [Railway documentation](https://docs.railway.app/)
-* [Template updates](https://docs.railway.com/reference/templates#updatable-templates)
+* [Operately docs](https://github.com/operately/operately/blob/main/docs/installation/single-host.md)
+* [Railway docs](https://docs.railway.app/)
 
 <!-- footer -->
 ---
