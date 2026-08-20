@@ -12,6 +12,8 @@ LABEL description="Operately Template for Railway"
 # built, so anything created under /media at build time is gone by boot time).
 USER root
 RUN mkdir -p /opt/operately/certs && chown -R nobody:root /opt/operately/certs
+COPY predeploy.sh /opt/operately/bin/predeploy.sh
+RUN chmod +x /opt/operately/bin/predeploy.sh
 USER nobody
 
 # Railway ignores EXPOSE and routes traffic to the port named by $PORT.

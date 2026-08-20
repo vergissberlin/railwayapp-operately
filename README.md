@@ -72,6 +72,9 @@ OPERATELY_HOST=${{RAILWAY_PUBLIC_DOMAIN}}   # Bare hostname only, no scheme or p
 OPERATELY_URL_SCHEME=https   # Railway always terminates TLS at the edge
 ALLOW_LOGIN_WITH_EMAIL=yes   # Without this and without Google OAuth configured, nobody can log in
 ALLOW_SIGNUP_WITH_EMAIL=yes   # Allows the first account to be created without SMTP/Google OAuth
+CERT_DOMAIN=""   # Must be set (empty string, not unset) or Operately crashes at boot — see below
+CERT_EMAILS=""   # Same requirement as CERT_DOMAIN
+CERT_DB_DIR=/opt/operately/certs   # Baked into the image; only backs an unused internal listener
 ```
 
 Set real credentials as Railway variables, never in a file inside this repository.
@@ -125,13 +128,24 @@ MIT — see [LICENSE](LICENSE).
 * Healthcheck path: `/health`
 * Restart policy: `ON_FAILURE` with up to 10 retries
 * Dockerfile-based build
-* `preDeployCommand`: `/opt/operately/bin/create_db` followed by `/opt/operately/bin/migrate`,
-  the same two release commands the official single-host installer runs
+* `preDeployCommand`: runs `predeploy.sh`, which calls `/opt/operately/bin/create_db` then
+  `/opt/operately/bin/migrate` — the same two release commands the official single-host
+  installer runs. Railway's `preDeployCommand` only accepts a single command, so chaining
+  them needed a real script rather than a `&&`-joined string.
 
 Operately listens on `$PORT` directly, so no start command or entrypoint wrapper is configured.
-`CERT_DOMAIN`/`CERT_AUTO_RENEW`/`CERT_EMAILS`/`CERT_DB_DIR` are deliberately left unset — those
-drive Operately's own Let's Encrypt integration for self-managed hosts, which is redundant and
-potentially conflicting with Railway's edge TLS.
+
+**`CERT_DOMAIN`/`CERT_EMAILS`/`CERT_DB_DIR` must be set, even though this template never uses
+real TLS certificates.** Operately's `SiteEncrypt.Phoenix.Endpoint` child validates and chmods
+these at every boot regardless of `CERT_AUTO_RENEW` — leaving them unset crashes the app with a
+`FunctionClauseError` (nil domain) or a `File.Error` (nil/unwritable cert folder), not a graceful
+skip. This template sets `CERT_DOMAIN=""` and `CERT_EMAILS=""` (matching the official installer's
+own "skip TLS management" path) and points `CERT_DB_DIR` at `/opt/operately/certs` — a folder
+baked into the image and owned by `nobody`, deliberately outside the `/media` volume mount (a
+volume's contents replace whatever was baked into its mount path at build time, so a directory
+created under `/media` in the Dockerfile does not exist yet when the container actually boots).
+The resulting self-signed certificate and the internal `:4001` HTTPS listener are both unused —
+Railway terminates real TLS at its edge and only ever talks to the app over plain HTTP on `$PORT`.
 
 ## 📚 Resources
 

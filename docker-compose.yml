@@ -17,6 +17,9 @@ services:
       - OPERATELY_URL_SCHEME=${OPERATELY_URL_SCHEME}
       - ALLOW_LOGIN_WITH_EMAIL=${ALLOW_LOGIN_WITH_EMAIL}
       - ALLOW_SIGNUP_WITH_EMAIL=${ALLOW_SIGNUP_WITH_EMAIL}
+      - CERT_DOMAIN=
+      - CERT_EMAILS=
+      - CERT_DB_DIR=/opt/operately/certs
     ports:
       - 4000:4000
     volumes:
