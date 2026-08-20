@@ -8,5 +8,10 @@
   "image": "https://raw.githubusercontent.com/vergissberlin/railwayapp-operately/main/logo-operately.png",
   "description": "Deploy Operately, open-source goal and project tracking",
   "workspaceAutomation": true,
-  "logoFile": "logo-operately.png"
+  "logoFile": "logo-operately.png",
+  "badge": {
+    "label": "Operately",
+    "color": "3185FF",
+    "logo": "operately"
+  }
 }
