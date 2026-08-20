@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.2.1](https://github.com/vergissberlin/railwayapp-operately/compare/railwayapp-operately-v0.2.0...railwayapp-operately-v0.2.1) (2026-08-20)
+
+
+### Bug Fixes
+
+* run migrations via a real predeploy script, document CERT_* requirement ([8beae65](https://github.com/vergissberlin/railwayapp-operately/commit/8beae65469893aa01d90bcb1d5f9a8cd36ca3987))
+
+
+### Documentation
+
+* add Railway deploy button code ([56cc5c7](https://github.com/vergissberlin/railwayapp-operately/commit/56cc5c71dbfde32df9fa07095120238f59f3e904))
+* trim README under Railway's 10000-char templatePublish limit ([5fe0fa6](https://github.com/vergissberlin/railwayapp-operately/commit/5fe0fa69b6146bc5830c07c1ebf0f83985001bb0))
+
 ## [0.2.0](https://github.com/vergissberlin/railwayapp-operately/compare/railwayapp-operately-v0.1.0...railwayapp-operately-v0.2.0) (2026-08-20)
 
 
