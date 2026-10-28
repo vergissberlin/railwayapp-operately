@@ -45,33 +45,28 @@ proxy to configure by hand.
 
 ## 🚀 Quick Start
 
-1. Click "Deploy on Railway"
-2. Add a Postgres service to the project and reference it as `DATABASE_URL` (see below)
-3. Set the remaining environment variables listed below
-4. Attach a volume at `/media` before sending production traffic
-5. Wait for the build — `preDeployCommand` creates the database and runs migrations
-   automatically — then open the generated URL
+1. Click "Deploy on Railway" — Postgres, the volume at `/media` and all secrets are pre-wired
+2. Wait for the build — `preDeployCommand` creates the database and runs migrations
+   automatically — then open the generated URL and sign up
 
 ## ⚙️ Configuration
 
 ### Environment variables
 
 ```bash
-DATABASE_URL=${{Postgres.DATABASE_URL}}     # reference to a separate Postgres service
-SECRET_KEY_BASE=generate-a-secret           # Railway "generate" button; signs/encrypts cookies
-OPERATELY_BLOB_TOKEN_SECRET_KEY=generate-a-secret   # signs file/blob URLs
-SYSTEM_SETTINGS_ENCRYPTION_KEYS=generate-a-secret   # encrypts stored settings
+DATABASE_URL=${{Postgres.DATABASE_URL}}     # reference to the Postgres service
+SECRET_KEY_BASE=generated                   # hex, 64 chars; signs/encrypts cookies
+OPERATELY_BLOB_TOKEN_SECRET_KEY=generated   # standard base64 (32 bytes); signs file URLs
+SYSTEM_SETTINGS_ENCRYPTION_KEYS=generated   # comma-separated key list; encrypts settings
+OPERATELY_INSTALLATION_ID=generated         # hex, 32 chars
 OPERATELY_HOST=${{RAILWAY_PUBLIC_DOMAIN}}   # bare hostname, no scheme or port
 OPERATELY_URL_SCHEME=https
 ALLOW_LOGIN_WITH_EMAIL=yes    # without this + no Google OAuth, nobody can log in
 ALLOW_SIGNUP_WITH_EMAIL=yes
-CERT_DOMAIN=""                # must be set (empty string, not unset) — see below
-CERT_EMAILS=""
-CERT_DB_DIR=/opt/operately/certs
 ```
 
-Set real values as Railway variables, never in a file in this repo. `PORT` defaults to `4000`
-and Railway sets it for you. `requiredMountPath = "/media"` in `railway.toml` — attach a volume
+The template generates all secrets on deploy. Set real values as Railway variables, never in a
+file in this repo. `PORT` defaults to `4000` and Railway sets it for you. `requiredMountPath = "/media"` in `railway.toml` — attach a volume
 there before production traffic, or uploads are lost on every redeploy.
 
 ## 🐳 Local Development
@@ -93,6 +88,10 @@ open http://localhost:4000.
 Found a bug? [Open an issue](https://github.com/vergissberlin/railwayapp-operately/issues/new)
 or a pull request. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
+## 💬 Support
+
+Questions or feedback? Visit the [template forum on Railway Central Station](https://station.railway.com/templates/operately-4f1d160d).
+
 ## 📝 License
 
 MIT — see [LICENSE](LICENSE).
@@ -104,12 +103,10 @@ MIT — see [LICENSE](LICENSE).
 * `preDeployCommand` runs `predeploy.sh` (`create_db` then `migrate`) — Railway only accepts one
   command, so chaining needed a real script, not a `&&`-joined string
 * Operately reads `$PORT` directly, no start command or entrypoint wrapper needed
-* `CERT_DOMAIN`/`CERT_EMAILS`/`CERT_DB_DIR` are set even though no real TLS cert is used here:
-  Operately's cert-management child validates and chmods these at every boot regardless of
-  `CERT_AUTO_RENEW`, and unset values crash the app. Empty strings for the first two match the
-  official installer's own "skip TLS" path; `CERT_DB_DIR=/opt/operately/certs` is a
-  `nobody`-owned folder baked into the image, kept outside `/media` (a volume's contents replace
-  whatever the Dockerfile put at its mount path, so it isn't there by boot time).
+* `CERT_DOMAIN=""`, `CERT_EMAILS=""` and `CERT_DB_DIR=/opt/operately/certs` are baked into the
+  image as `ENV`: Operately's cert child reads them at every boot and crashes if they are unset.
+  Empty strings match the official installer's "skip TLS" path; the folder is `nobody`-owned and
+  outside `/media`. Setting them on the service still overrides the image values.
 
 ## 📚 Resources
 

@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.2.2](https://github.com/vergissberlin/railwayapp-operately/compare/railwayapp-operately-v0.2.1...railwayapp-operately-v0.2.2) (2026-10-28)
+
+
+### Bug Fixes
+
+* bake empty CERT_* defaults into the image so deploys need no CERT variables ([#10](https://github.com/vergissberlin/railwayapp-operately/issues/10)) ([a1ec13e](https://github.com/vergissberlin/railwayapp-operately/commit/a1ec13ed6e99d870c964e878a258ce7000788421))
+
+
+### Documentation
+
+* add template forum link ([#8](https://github.com/vergissberlin/railwayapp-operately/issues/8)) ([9612e28](https://github.com/vergissberlin/railwayapp-operately/commit/9612e2867edbcb1c3c6af3f92bf8f2cadaa2e787))
+
 ## [0.2.1](https://github.com/vergissberlin/railwayapp-operately/compare/railwayapp-operately-v0.2.0...railwayapp-operately-v0.2.1) (2026-08-20)
 
 
