@@ -16,6 +16,14 @@ COPY predeploy.sh /opt/operately/bin/predeploy.sh
 RUN chmod +x /opt/operately/bin/predeploy.sh
 USER nobody
 
+# Operately's cert child reads CERT_* at every boot, even with CERT_AUTO_RENEW unset (manual
+# mode): an unset CERT_DOMAIN/CERT_DB_DIR crashes it, while empty strings are the official
+# installer's "no TLS" path. Baking them in means Railway deploys need no CERT_* variables;
+# any value set on the service still overrides these.
+ENV CERT_DOMAIN="" \
+    CERT_EMAILS="" \
+    CERT_DB_DIR=/opt/operately/certs
+
 # Railway ignores EXPOSE and routes traffic to the port named by $PORT.
 # EXPOSE documents the local default, ENV PORT keeps that default reproducible.
 ENV PORT=4000
