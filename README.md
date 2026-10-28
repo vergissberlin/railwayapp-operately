@@ -93,6 +93,10 @@ open http://localhost:4000.
 Found a bug? [Open an issue](https://github.com/vergissberlin/railwayapp-operately/issues/new)
 or a pull request. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
+## 💬 Support
+
+Questions or feedback? Visit the [template forum on Railway Central Station](https://station.railway.com/templates/operately-4f1d160d).
+
 ## 📝 License
 
 MIT — see [LICENSE](LICENSE).
