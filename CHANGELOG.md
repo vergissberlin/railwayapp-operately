@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.3](https://github.com/vergissberlin/railwayapp-operately/compare/railwayapp-operately-v0.2.2...railwayapp-operately-v0.2.3) (2026-10-28)
+
+
+### Chores
+
+* **deps:** update operately/operately docker tag to v1.10.0 ([#7](https://github.com/vergissberlin/railwayapp-operately/issues/7)) ([8c0b02e](https://github.com/vergissberlin/railwayapp-operately/commit/8c0b02ee6c4526639074c9ddd30b488f61403f59))
+
 ## [0.2.2](https://github.com/vergissberlin/railwayapp-operately/compare/railwayapp-operately-v0.2.1...railwayapp-operately-v0.2.2) (2026-10-28)
 
 
