@@ -1,4 +1,4 @@
-ARG VERSION=1.10.0
+ARG VERSION=1.11.0
 
 FROM operately/operately:${VERSION}
 
